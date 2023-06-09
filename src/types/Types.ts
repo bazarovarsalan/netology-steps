@@ -3,7 +3,6 @@
     distance: string
   }
 
-
   export type StepsFormProps = {
     steps: ISteps,
     onChange: (arg1: string, arg2: string) => void,

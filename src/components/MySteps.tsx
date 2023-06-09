@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import StepsForm from './StepsForm';
 import StepsList from './StepsList';
-import {ISteps} from "../types/Types"
+import {ISteps, IError} from "../types/Types"
 
 
 const MySteps = () => {
@@ -17,6 +17,8 @@ const MySteps = () => {
         {date: '20.07.2019', distance: '5.7'},
         {date: '30.06.2019', distance: '15.7'}
       ])
+
+    const [errorDate, setErrorDate] = useState(false);
   
 
     const handleChange = (event:string, value:string) => {
@@ -24,13 +26,22 @@ const MySteps = () => {
     };
 
     function handleSave (training:ISteps) : void {
-      setStepsList((prevStepsList) => [...prevStepsList, training]);
+      setStepsList((prevStepsList) => {
+        const idx = prevStepsList.findIndex(steps => steps.date === training.date);
+        if (idx < 0 ) {
+          return [...prevStepsList, training];
+        } else {
+          const newDistance = Number(prevStepsList[idx].distance) + Number(training.distance);
+          const newStepList = [...prevStepsList];
+          newStepList[idx] = {date: training.date, distance: newDistance.toString()};
+          return newStepList;
+        }
+      })
       setSteps({
           date: '',
           distance: '',
-        });
-       };
-
+      });
+    }
 
        const handleDelete = (date:string) => {
         setStepsList((prev) =>
@@ -38,15 +49,13 @@ const MySteps = () => {
         );
       };
     
-      const sorted = stepsList.sort((a:ISteps|any, b:ISteps|any) : number => {
-        a = a.date.split('.').reverse().join('');
-        b = b.date.split('.').reverse().join('');
-        return a > b ? 1 : a < b ? -1 : 0;
-      }
+      const sorted: ISteps[] = stepsList.sort((a:ISteps, b:ISteps) : number => {
+       const  c = a.date.split('.').reverse().join('');
+       const  d = b.date.split('.').reverse().join('');
+        return c > d ? 1 : c < d ? -1 : 0;
+      });
 
-     // Здесь  sorted не смог типизировать, пришлось указать в качестве альтернативной типизации any. Как типизировать было лучше?
-    
-     );
+
 
   return (
     <div className="MySteps">
